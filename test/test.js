@@ -65,6 +65,22 @@ describe('express-rate-limit node module', function() {
             });
     }
 
+    function badJsonRequest(errorHandler, successHandler) {
+        request(app)
+            .get('/')
+            .expect(429)
+            .expect('Content-Type', /json/)
+            .end(function(err, res) {
+                if (err) {
+                    return errorHandler(err);
+                }
+                delay = Date.now() - start;
+                if (successHandler) {
+                    successHandler(null, res);
+                }
+            });
+    }
+
     function badRequestWithMessage(errorHandler, successHandler) {
         request(app)
             .get('/')
@@ -300,5 +316,19 @@ describe('express-rate-limit node module', function() {
             });
         });
     });
+
+    it ("should respond with a JSON object", function (done) {
+      var limiter = rateLimit({
+          delayMs: 100,
+          max: 1,
+          windowMs: 50
+      });
+      createAppWith(limiter);
+    });
+
+    it ("should respond with a text/html message", function (done) {
+
+    });
+
 
 });
